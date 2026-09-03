@@ -26,7 +26,7 @@ import {
   unlockPost,
 } from './post-moderation.controller.js';
 import { getSolvedPosts } from './post-reads.controller.js';
-import { checkDuplicateController } from './post-duplicate.controller.js';
+import { checkDuplicateController, resolveDeflectionController } from './post-duplicate.controller.js';
 import {
   getAnswersList,
   addComment,
@@ -76,6 +76,8 @@ router.get('/:id', validateObjectId('id'), getPostById);
 router.get('/:id/related', validateObjectId('id'), getRelatedForPost);
 
 router.post('/check-duplicate', protect, validateBody(checkDuplicateSchema), checkDuplicateController);
+router.post('/resolve-deflection', protect, resolveDeflectionController);
+
 router.post('/', protect, validateBody(createPostSchema), createPost);
 // M4-5 (MEDIUM) fix: `toggleUpvote` previously read `alreadyUpvoted`
 // BEFORE the atomic update (see post-mutations.controller.ts:272).

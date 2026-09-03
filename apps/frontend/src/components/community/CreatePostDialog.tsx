@@ -1,8 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import QuestionDeflectionOverlay, { type DuplicateMatch } from './QuestionDeflectionOverlay';
 import Button from '../ui/Button';
+
 import api, { friendlyError } from '../../utils/api';
 import type { Post } from '../../types/ui';
+
 import { useAuth } from '../../hooks/useAuth';
 import { useAuthModal } from '../../context/AuthModalContext';
 import { useGcsUpload, type GcsAsset } from '../../hooks/useGcsUpload';
@@ -207,6 +210,20 @@ export default function CreatePostDialog({ onClose, onCreated, prefillTitle = ''
     try { sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ t: title, b: val })); } catch { void 0 }
   };
 
+  const handleDeflected = async (match: DuplicateMatch) => {
+    try {
+      await api.post('/community/resolve-deflection', {
+        matchId: match._id,
+        matchType: match.source,
+        title: title.trim(),
+      });
+    } catch { void 0 }
+    try { sessionStorage.removeItem(DRAFT_KEY); } catch { void 0 }
+    showToast('🎉 Glad we could help! You saved time and avoided a duplicate question.', 'success');
+    dialogRef.current?.close();
+  };
+
+
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
@@ -409,6 +426,14 @@ export default function CreatePostDialog({ onClose, onCreated, prefillTitle = ''
               <p className="text-xs text-ink-faint text-right">{title.length}/150</p>
             </div>
           </div>
+
+          <QuestionDeflectionOverlay
+            matches={(duplicateMatch?.matches as DuplicateMatch[]) ?? []}
+            queryTitle={title}
+            onDeflected={handleDeflected}
+            checking={checkingDuplicates}
+          />
+
 
           {duplicateMatch && duplicateMatch.isDuplicate && duplicateMatch.matches.length > 0 && (
             <div className="faq-match-banner">

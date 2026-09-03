@@ -12,9 +12,21 @@ Four zero-touch pillars, in order of automation:
 2. **Answer** — Unanswered community posts are auto-matched against the knowledge base every 24h via semantic search. High-confidence matches are auto-posted; low-confidence escalate to admins.
 3. **Quality** — Approved FAQs are re-evaluated every 6h for drift, contradictions, and staleness. Drift is auto-flagged.
 4. **Lifecycle** — User deletion is anonymisation, not destruction. Reputation, attribution, and audit history persist.
+- **Real-time observability** — tagged colored logs (`[ INFO ] [ cron ]` etc.), Discord ALERT webhook, optional Sentry.
 
 ---
+---
 
+## Offline Mode
+
+The application supports Progressive Web App (PWA) functionality to improve usability when internet connectivity is unavailable.
+
+### Features
+
+- Displays an offline banner when the user loses internet connectivity.
+- Allows access to previously cached FAQ pages.
+- Provides a Retry button to refresh the application when the network is restored.
+- Improves user experience by clearly indicating online and offline status.
 ## Key features
 
 - **Hybrid search** — vector + keyword + Reciprocal Rank Fusion. Auto-falls-back to keyword when vector search is empty.
