@@ -6,6 +6,7 @@ import { computeRRF, applySearchThreshold, type SearchResultItem } from '../../u
 // v1.69 — Phase 3h: program-scope the community search.
 import { withProgramScope } from '../../utils/db/scopedQuery.js';
 import { communityLog } from '../../utils/http/logger.js';
+import { readSetting } from '../program/app-setting.model.js';
 
 const COLLECTION_NAME = CommunityPost.collection.name;
 
@@ -124,7 +125,20 @@ export const searchCommunityPosts = async (req: Request, res: Response): Promise
 
     const merged = computeRRF(vectorResults, textResults);
 
-    const filtered = applySearchThreshold(merged)
+    // Resolve configured or custom threshold
+    const customThreshold = req.query.threshold;
+    let thresholdVal: number | undefined;
+    if (customThreshold !== undefined && customThreshold !== null) {
+      const parsed = parseFloat(String(customThreshold));
+      if (!isNaN(parsed) && parsed >= 0 && parsed <= 1) {
+        thresholdVal = parsed;
+      }
+    }
+    const searchThreshold = thresholdVal !== undefined
+      ? thresholdVal
+      : await readSetting('searchThreshold', 0.80, batchIdParam);
+
+    const filtered = applySearchThreshold(merged, searchThreshold)
       .slice(0, 20);
 
     const ids = filtered.map((d) => d._id);

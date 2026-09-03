@@ -116,6 +116,12 @@ export async function adminUpdateSetting(req: Request, res: Response): Promise<v
       res.status(400).json({ message: `${key} must be a string.` });
       return;
     }
+  } else if (key === 'searchThreshold') {
+    const n = Number(body.value);
+    if (!Number.isFinite(n) || n < 0 || n > 1) {
+      res.status(400).json({ message: 'searchThreshold must be a number between 0 and 1.' });
+      return;
+    }
   } else {
     res.status(400).json({ message: `Unknown setting key: ${key}` });
     return;

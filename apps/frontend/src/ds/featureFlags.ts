@@ -91,6 +91,17 @@ export const FEATURE_FLAGS = {
       'the button is hidden from the UI. Toggle on to re-enable the chatbot for users.',
     category: 'ai',
   },
+  offlineMode: {
+    default: false,
+    label: 'Offline Mode (PWA)',
+    description:
+      'Registers a service worker that caches the FAQ list and previously-visited FAQ ' +
+      'detail pages so they remain viewable without a network connection, and enables ' +
+      'the Web App Manifest so the site can be installed. Frontend-only — no backend ' +
+      'routes are affected. When disabled, the service worker is not registered (and ' +
+      'is actively unregistered if it was previously active).',
+    category: 'experimental',
+  },
 } as const satisfies Record<string, FeatureFlagMeta>;
 
 export type FeatureFlagKey = keyof typeof FEATURE_FLAGS;

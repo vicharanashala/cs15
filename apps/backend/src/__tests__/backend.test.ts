@@ -314,6 +314,24 @@ describe('applySearchThreshold', () => {
     const filtered = applySearchThreshold(results);
     expect(filtered.map((r: any) => r._id.toString())).toEqual(['c', 'a', 'b']);
   });
+
+  it('should filter based on a custom threshold when provided', () => {
+    const results = [
+      { _id: { toString: () => 'a' } as any, source: 'faq' as const, score: 1, textScore: 0, vectorScore: 0.75 } as any,
+      { _id: { toString: () => 'b' } as any, source: 'faq' as const, score: 1, textScore: 0, vectorScore: 0.65 } as any,
+    ];
+    const filtered = applySearchThreshold(results, 0.70);
+    expect(filtered).toHaveLength(1);
+    expect(filtered[0]._id.toString()).toBe('a');
+  });
+
+  it('should include exact match threshold score when >= is used', () => {
+    const results = [
+      { _id: { toString: () => 'a' } as any, source: 'faq' as const, score: 1, textScore: 0, vectorScore: 0.80 } as any,
+    ];
+    const filtered = applySearchThreshold(results, 0.80);
+    expect(filtered).toHaveLength(1);
+  });
 });
 
 // ==========================================

@@ -13,6 +13,7 @@ import {
 } from '../../utils/http/search.js';
 import { searchRequests, searchResultsReturned, searchLogFlushActive, searchLogFlushes } from '../../utils/http/metrics.js';
 import { searchKnowledge } from '../knowledge/knowledge-base.service.js';
+import { readSetting } from '../program/app-setting.model.js';
 
 // Cache configuration: Store up to 500 recent queries for 1 hour to reduce DB/AI loads
 const searchCache = new LRUCache<string, SearchResultItem[]>({
@@ -233,8 +234,21 @@ export const semanticSearch = async (req: Request, res: Response): Promise<void>
     
     const normalizedQuery = query.trim().toLowerCase();
 
+    // Parse custom threshold from request if provided (body or query params)
+    const customThreshold = req.body.threshold !== undefined ? req.body.threshold : req.query.threshold;
+    let thresholdVal: number | undefined;
+    if (customThreshold !== undefined && customThreshold !== null) {
+      const parsed = parseFloat(String(customThreshold));
+      if (!isNaN(parsed) && parsed >= 0 && parsed <= 1) {
+        thresholdVal = parsed;
+      }
+    }
+
+    // Use threshold-specific cache key to prevent collision with default threshold searches
+    const cacheKey = thresholdVal !== undefined ? `${normalizedQuery}:${thresholdVal}` : normalizedQuery;
+
     // 1. Check Redis semantic cache first (shared across all serverless instances)
-    const redisCached = await getCachedResults(normalizedQuery);
+    const redisCached = await getCachedResults(cacheKey);
     if (redisCached) {
       searchRequests.inc({ source: 'redis', cached: 'true' });
       searchResultsReturned.observe({ source: 'redis' }, redisCached.results.length);
@@ -253,9 +267,9 @@ export const semanticSearch = async (req: Request, res: Response): Promise<void>
     }
 
     // 2. Check LRU Cache for immediate response (process-local fallback)
-    if (searchCache.has(normalizedQuery)) {
-      const cachedResults = searchCache.get(normalizedQuery)!;
-      await setCachedResults(normalizedQuery, cachedResults);
+    if (searchCache.has(cacheKey)) {
+      const cachedResults = searchCache.get(cacheKey)!;
+      await setCachedResults(cacheKey, cachedResults);
       searchRequests.inc({ source: 'lru', cached: 'true' });
       searchResultsReturned.observe({ source: 'lru' }, cachedResults.length);
       const topResult = cachedResults[0] || null;
@@ -317,8 +331,13 @@ export const semanticSearch = async (req: Request, res: Response): Promise<void>
     // 4. Merge results using Reciprocal Rank Fusion
     const merged = computeRRF(allVec, allTxt);
 
+    // Resolve configured or custom threshold
+    const searchThreshold = thresholdVal !== undefined
+      ? thresholdVal
+      : await readSetting('searchThreshold', 0.80, batchIdObjectId);
+
     // 5. Apply threshold filters to remove irrelevant garbage results
-    const filtered = applySearchThreshold(merged).slice(0, 5); // Return only the absolute top 5 results
+    const filtered = applySearchThreshold(merged, searchThreshold).slice(0, 5); // Return only the absolute top 5 results
 
     // 5b. TranscriptKnowledge fallback — if FAQ + Community returned nothing,
     // try the auto-extracted Zoom knowledge base. Zero-human data path:
@@ -343,8 +362,8 @@ export const semanticSearch = async (req: Request, res: Response): Promise<void>
             score: k.score,
           }));
           const final = knowledgeResults.slice(0, 5);
-          searchCache.set(normalizedQuery, final);
-          await setCachedResults(normalizedQuery, final);
+          searchCache.set(cacheKey, final);
+          await setCachedResults(cacheKey, final);
           bufferSearchLog({
             query,
             resultsCount: final.length,
@@ -364,8 +383,8 @@ export const semanticSearch = async (req: Request, res: Response): Promise<void>
     }
 
     // 6. Save to both Redis (shared) and LRU (process-local)
-    searchCache.set(normalizedQuery, filtered);
-    await setCachedResults(normalizedQuery, filtered);
+    searchCache.set(cacheKey, filtered);
+    await setCachedResults(cacheKey, filtered);
 
     // 7. Buffer search log entry for batched async write (non-blocking)
     const topResult = filtered[0] || null;

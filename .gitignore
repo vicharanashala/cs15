@@ -62,6 +62,7 @@ apps/backend/**/*.js                 # compiled subdirectory output
 apps/frontend/dist/
 apps/frontend/build/
 apps/frontend/.vite/
+apps/frontend/dev-dist/
 
 # General
 dist/

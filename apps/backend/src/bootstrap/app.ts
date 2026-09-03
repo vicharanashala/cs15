@@ -8,7 +8,7 @@ import { registerMiddleware } from './middleware.js';
 import { registerRoutes } from './routes.js';
 import { getMetrics } from '../utils/http/metrics.js';
 import { logger } from '../utils/http/logger.js';
-import { internalApiKeyOrAdmin } from '../middleware/internalApiKeyOrAdmin.js';
+
 import { getContext } from '../utils/http/requestContext.js';
 import { sentryRequestTagsMiddleware } from '../utils/sentryTags.js';
 
@@ -187,7 +187,7 @@ export function createApp(config: any): Express {
       },
     });
   }
-  app.use((err: { status?: number; message?: string; stack?: string }, req: Request, res: Response, next: NextFunction) => {
+  app.use((err: { status?: number; message?: string; stack?: string }, req: Request, res: Response, _next: NextFunction) => {
     const requestId: string = (req as Request & { id: string }).id || '-';
     Sentry.captureException(err);
     logger.error(err.stack || err.message || 'Unknown error', { status: err.status }, requestId);

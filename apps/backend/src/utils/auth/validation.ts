@@ -167,6 +167,7 @@ export const refreshSchema = z.object({
 export const searchSchema = z.object({
   query: z.string().min(1).max(200),
   batchId: z.string().regex(/^[0-9a-fA-F]{24}$/).optional(),
+  threshold: z.union([z.number(), z.string()]).optional(),
 });
 
 // v1.79.1 (HOTFIX) — `feedback` was being POSTed by `SearchFeedback.tsx`

@@ -65,6 +65,7 @@ export interface IProgramAppSettings {
   autoAnswerBatchSize?: number;
   autoAnswerMinAgeHours?: number;
   faqDuplicateThreshold?: number;
+  searchThreshold?: number;
 }
 
 export interface IProgramConfig extends Document {
@@ -115,7 +116,8 @@ const programConfigSchema = new MongooseSchema<IProgramConfig>(
       autoAnswerMinConfidence: { type: Number, default: null },
       autoAnswerBatchSize: { type: Number, default: null },
       autoAnswerMinAgeHours: { type: Number, default: null },
-      faqDuplicateThreshold: { type: Number, default: null }
+      faqDuplicateThreshold: { type: Number, default: null },
+      searchThreshold: { type: Number, default: null }
     },
   },
   { timestamps: true }

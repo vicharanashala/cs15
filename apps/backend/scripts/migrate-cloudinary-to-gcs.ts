@@ -62,7 +62,7 @@ async function uploadToGcs(opts: {
     ? opts.oldPublicId.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/^\.+/, '').slice(0, 80) || 'file'
     : 'migrated';
   const uuid = randomUUID().replace(/-/g, '').slice(0, 12);
-  const ext = safeName.includes('.') ? safeName.slice(safeName.lastIndexOf('.')) : '';
+ 
   const objectPath = `${opts.subfolder}/${opts.userId}/${uuid}-${safeName}`;
   const file = opts.bucket.file(objectPath);
   await file.save(opts.bytes, {

@@ -12,6 +12,9 @@ import ErrorBoundary from './components/ui/ErrorBoundary';
 // using the app. Mounts inside AuthProvider (needs `useAuth`) and
 // outside AppRoutes (needs to overlay every page uniformly).
 import InternshipEndDateGate from './context/InternshipEndDateGate';
+// Offline Mode (PWA) — headless manager that (un)registers the service
+// worker based on the `offlineMode` feature flag. Renders nothing.
+import OfflineModeManager from './offline/OfflineModeManager';
 
 export default function App() {
   return (
@@ -19,6 +22,7 @@ export default function App() {
       <AuthProvider>
         <BatchProvider>
           <FeatureFlagProvider>
+            <OfflineModeManager />
             <AuthModalHost>
               <Suspense fallback={<div className="min-h-screen bg-bg flex items-center justify-center"><Spinner size="md" /></div>}>
                 <ErrorBoundary sectionName="App (top-level)">

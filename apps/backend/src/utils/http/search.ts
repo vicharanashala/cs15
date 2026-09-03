@@ -80,8 +80,8 @@ export function computeRRF(
  * A document is kept if it has any keyword match (textScore > 0) OR
  * a strong semantic match (vectorScore > 0.80).
  */
-export function applySearchThreshold(results: SearchResultItem[]): SearchResultItem[] {
+export function applySearchThreshold(results: SearchResultItem[], threshold = 0.80): SearchResultItem[] {
   return results.filter(
-    (doc) => (doc.textScore && doc.textScore > 0) || (doc.vectorScore && doc.vectorScore > 0.80)
+    (doc) => (doc.textScore && doc.textScore > 0) || (doc.vectorScore && doc.vectorScore >= threshold)
   );
 }

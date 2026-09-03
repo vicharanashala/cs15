@@ -136,7 +136,7 @@ export async function getConfig(
     }
   }
 
-  const { isCritical, category } = categorize(key);
+  const { isCritical } = categorize(key);
 
   // Layer 3: Mongo (per-program first, then global)
   const mongoResult = await lookupInMongo(key, programId);
@@ -146,7 +146,7 @@ export async function getConfig(
       source: 'mongo',
       isEncrypted: mongoResult.encrypted,
       key,
-      category,
+      category: isCritical ? 'critical' : 'non-critical',
       scope: programId ? 'program' : 'global',
       mongoId: mongoResult.mongoId,
     };
@@ -162,7 +162,7 @@ export async function getConfig(
       source: 'env',
       isEncrypted: false,
       key,
-      category,
+      category: isCritical ? 'critical' : 'non-critical',
       scope: programId ? 'program' : 'global',
     };
     cache.set(ck, { value: result, expiresAt: Date.now() + CACHE_TTL_MS });
@@ -177,7 +177,7 @@ export async function getConfig(
       source: 'default',
       isEncrypted: false,
       key,
-      category,
+      category: isCritical ? 'critical' : 'non-critical',
       scope: programId ? 'program' : 'global',
     };
     cache.set(ck, { value: result, expiresAt: Date.now() + CACHE_TTL_MS });
@@ -190,7 +190,7 @@ export async function getConfig(
     source: 'default',
     isEncrypted: false,
     key,
-    category,
+    category: isCritical ? 'critical' : 'non-critical',
     scope: programId ? 'program' : 'global',
   };
   // Cache undefineds briefly too — saves repeated lookups for missing keys.
@@ -319,9 +319,6 @@ function getCrypto() {
   return { encrypt: _encrypt!, decrypt: _decrypt! };
 }
 
-function encryptStored(plaintext: string): string {
-  return getCrypto().encrypt(plaintext);
-}
 
 function decryptStored(ciphertext: string): string {
   return getCrypto().decrypt(ciphertext);

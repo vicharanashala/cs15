@@ -4,34 +4,26 @@ Full-stack FAQ portal with semantic vector search, AI-powered community moderati
 
 GitHub: https://github.com/vicharanashala/crowd-source-faq
 Full reference: [`docs/`](docs/README.md) · [Contributing](./CONTRIBUTING.md) · [Code of Conduct](./CODE_OF_CONDUCT.md) · [License](./LICENSE)
-
 ---
-
 ## Vision
-
 **Automate the FAQ lifecycle end-to-end. Zero people in the loop. Reduce the operational FAQ culture.**
-
 Every question a user has has been asked before — and most will be asked again. The right answer should be there before the user finishes typing. The platform achieves this through four zero-touch pillars:
-
 - **Zero-touch ingestion** — Zoom meetings, webhooks, and manual uploads feed the knowledge base without human scheduling, categorising, or approval.
 - **Zero-touch answering** — A 24-hour scheduler matches unanswered posts against the knowledge base; high-confidence matches auto-post, low-confidence escalate to humans.
 - **Zero-touch quality control** — Approved FAQs are re-evaluated every 6 hours; drift, contradictions, and staleness are detected and flagged automatically.
 - **Zero-touch user lifecycle** — Deletion is anonymisation, not destruction. Reputation, attribution, and audit history persist.
 
 The platform is the operator. People handle exceptions, not the steady state.
-
 ---
 
 ## About
 
 Samagama (internally "Yaksha FAQ Portal") turns an organisation's accumulated conversations into a searchable, self-maintaining FAQ. It combines hybrid vector + keyword search with a community Q&A board and a fully automated ingestion pipeline that pulls transcripts from Zoom, extracts Q&A with AI, and indexes them for retrieval in seconds.
-
 Built for organisations whose community generates more questions than a human team can answer — student cohorts, open-source projects, internal forums, customer-success communities. Target scale: 1 million registered users with constant conversational input.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the architecture deep-dive and [docs/PIPELINES.md](docs/PIPELINES.md) for pipeline internals.
 
 ---
-
 ## Tech Stack
 
 | Layer | Technologies |
@@ -42,7 +34,6 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the architecture deep-dive 
 | Search & AI | Xenova/transformers (768-dim local embeddings), Atlas Vector Search, $text search, Reciprocal Rank Fusion |
 | AI Providers | Anthropic, OpenAI, XAI, MiniMax (per-pipeline configurable) |
 | DevOps | Sentry, Ngrok (local webhook tunnel), Twilio (SMS), SMTP, Vitest |
-
 ---
 
 ## Quick Start
@@ -54,6 +45,12 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the architecture deep-dive 
 `run.sh` prompts for `MONGODB_URI` and `JWT_SECRET` on first run, then saves them to `apps/backend/.env.local`. The script will not overwrite existing values. Session logs are written to `logs/session_*.txt`.
 
 ---
+
+## Browser Compatibility
+
+For the best experience, use the latest version of a modern browser such as **Google Chrome**, **Microsoft Edge**.
+
+Some features, including Progressive Web App (PWA) support and Offline Mode, depend on browser capabilities such as Service Workers. Older browsers may not support these features completely.
 
 ## Key Features
 
@@ -83,8 +80,9 @@ The admin panel at `/admin` (mounted at `/api/admin/*`) provides telemetry, mode
 
 For the full admin route map and per-page behaviour, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
----
 
+
+---
 ## User Experience
 
 The user-facing app (`/`, `/faq`, `/community`, `/saved`, `/account`, `/leaderboard`) gives authenticated users full participation in the knowledge loop:
@@ -98,10 +96,10 @@ The user-facing app (`/`, `/faq`, `/community`, `/saved`, `/account`, `/leaderbo
 - **Zoom integration** — per-user OAuth from `/account`, manual `.vtt` / `.txt` / raw-text upload, last-synced status card, no admin required
 - **Search feedback** — "Report missing FAQ" on zero results, admin-promotable to FAQ
 
+
 For per-route behaviour and field schemas, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ---
-
 ## Project Structure
 
 ```
@@ -124,6 +122,9 @@ See [docs/ARCHITECTURE.md#10-env-variables-reference](docs/ARCHITECTURE.md#10-en
 
 ---
 
+
 ## License
 
 [MIT](./LICENSE) © 2026 vicharanashala
+
+

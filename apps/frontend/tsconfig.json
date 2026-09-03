@@ -20,7 +20,7 @@
     "noUnusedParameters": false,
     "allowJs": false,
 
-    "types": ["vite/client", "vitest/globals"],
+    "types": ["vite/client", "vitest/globals", "vite-plugin-pwa/client"],
     "paths": {
       "@/*": ["./src/*"]
     }

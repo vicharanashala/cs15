@@ -33,6 +33,7 @@ const HomePage = lazy(() => import('../pages/HomePage'));
 const FAQPage = lazy(() => import('../pages/FAQPage'));
 const CommunityPage = lazy(() => import('../pages/CommunityPage'));
 const SavedKnowledgePage = lazy(() => import('../pages/SavedKnowledgePage'));
+const OfflinePage = lazy(() => import('../pages/OfflinePage'));
 const SupportIndexPage = lazy(() => import('../pages/SupportIndexPage'));
 const NewSupportRequestPage = lazy(() => import('../pages/NewSupportRequestPage'));
 const SupportTicketPage = lazy(() => import('../pages/SupportTicketPage'));
@@ -168,6 +169,7 @@ export default function AppRoutes() {
             <Route path="/faq/:id" element={<RouteElement name="faq-:id"><FAQPage /></RouteElement>} />
             <Route path="/community" element={<RouteElement name="community"><CommunityPage /></RouteElement>} />
             <Route path="/saved" element={<RouteElement name="saved"><SavedKnowledgePage /></RouteElement>} />
+            <Route path="/offline" element={<RouteElement name="offline"><FeatureGate featureKey="offlineMode" featureLabel="Offline Mode"><OfflinePage /></FeatureGate></RouteElement>} />
             <Route path="/support" element={<RouteElement name="support"><SupportRoute /></RouteElement>} />
             <Route path="/support/new" element={<RouteElement name="support-new"><SupportNewRoute /></RouteElement>} />
             <Route path="/support/:id" element={<RouteElement name="support-:id"><SupportTicketRoute /></RouteElement>} />

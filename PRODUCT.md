@@ -12,9 +12,21 @@ Four zero-touch pillars, in order of automation:
 2. **Answer** — Unanswered community posts are auto-matched against the knowledge base every 24h via semantic search. High-confidence matches are auto-posted; low-confidence escalate to admins.
 3. **Quality** — Approved FAQs are re-evaluated every 6h for drift, contradictions, and staleness. Drift is auto-flagged.
 4. **Lifecycle** — User deletion is anonymisation, not destruction. Reputation, attribution, and audit history persist.
+- **Real-time observability** — tagged colored logs (`[ INFO ] [ cron ]` etc.), Discord ALERT webhook, optional Sentry.
 
 ---
+---
 
+## Offline Mode
+
+The application supports Progressive Web App (PWA) functionality to improve usability when internet connectivity is unavailable.
+
+### Features
+
+- Displays an offline banner when the user loses internet connectivity.
+- Allows access to previously cached FAQ pages.
+- Provides a Retry button to refresh the application when the network is restored.
+- Improves user experience by clearly indicating online and offline status.
 ## Key features
 
 - **Hybrid search** — vector + keyword + Reciprocal Rank Fusion. Auto-falls-back to keyword when vector search is empty.
@@ -27,7 +39,6 @@ Four zero-touch pillars, in order of automation:
 - **Real-time observability** — tagged colored logs (`[ INFO ] [ cron ]` etc.), Discord ALERT webhook, optional Sentry.
 
 ---
-
 ## Tech stack (one-liner per layer)
 
 | Layer | Pick |
@@ -39,8 +50,9 @@ Four zero-touch pillars, in order of automation:
 | AI providers | Anthropic, OpenAI, XAI, MiniMax, Gemini, custom — admin-configurable per-pipeline |
 | Infra | Sentry, Ngrok (webhook dev tunnel), Twilio (SMS), SMTP, Helmet, express-rate-limit, JWT, bcryptjs |
 
----
 
+
+---
 ## Recent changes (v1.68)
 
 - **Embedding model swap**: `Xenova/multi-qa-mpnet-base-dot-v1` (768-dim) → `mixedbread-ai/mxbai-embed-large-v1` (1024-dim, SOTA MTEB 64.68). Now routed through the HuggingFace Inference API when `HUGGINGFACE_API_KEY` is set, with a fall-back to the in-process ONNX pipeline. The retrieval-tuned query prompt (`Represent this sentence for searching relevant passages:`) is auto-prepended for queries via `generateQueryEmbedding()`.
@@ -49,8 +61,9 @@ Four zero-touch pillars, in order of automation:
 - **Observability overhaul** — 11 named loggers (`authLog`, `adminLog`, `cronLog`, etc.), background-colored level tags (`[ INFO ]`, `[ WARN ]`, `[ ERR ]`, `[ ALRT ]`), glyph-prefixed lines, Discord webhook forwarder with exponential-backoff retry queue.
 - **Live-data seed** — `npm run seed:live` populates 20 community posts, 8 support tickets, 2 zoom meetings, badge awards, search logs, and a populated leaderboard. Idempotent.
 
----
 
+
+---
 ## Reference docs
 
 | Topic | File |
@@ -75,8 +88,9 @@ Four zero-touch pillars, in order of automation:
 | License | [`LICENSE`](LICENSE) |
 
 ---
-
 ## Useful npm scripts (backend)
+
+
 
 | Script | What it does |
 |---|---|
@@ -99,3 +113,5 @@ Four zero-touch pillars, in order of automation:
 - GitHub: https://github.com/vicharanashala/crowd-source-faq
 - License: see [`LICENSE`](LICENSE)
 - Branch: `main` (active), with `MCSFAQ/main-v2` for the next iteration
+
+

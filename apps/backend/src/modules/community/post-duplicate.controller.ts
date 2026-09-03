@@ -381,3 +381,56 @@ export const checkDuplicateController = async (
     res.status(500).json({ message: 'Duplicate check failed' });
   }
 };
+
+/**
+ * POST /api/community/resolve-deflection
+ * Records a user's confirmation that a suggested match solved their question,
+ * deflecting post creation and optionally rewarding the author.
+ */
+export const resolveDeflectionController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  if (!req.user) {
+    res.status(401).json({ message: 'Not authorized' });
+    return;
+  }
+  try {
+    const { matchId, matchType, title } = req.body as {
+      matchId?: string;
+      matchType?: 'faq' | 'community' | 'knowledge';
+      title?: string;
+    };
+
+    communityLog.info(
+      `[deflection] User ${req.user._id} resolved question "${title || ''}" using ${matchType || 'unknown'} match ${matchId || 'none'}`
+    );
+
+    // If deflected via a community post, credit the post author with reputation
+    if (matchType === 'community' && matchId) {
+      try {
+        const post = await CommunityPost.findById(matchId).select('author').lean();
+        if (post?.author) {
+          const { reputationService } = await import('../../services/reputation.service.js');
+          await reputationService.award({
+            userId: post.author,
+            batchId: req.programContext?.batchId ?? null,
+            action: 'answer_accepted',
+            points: 5,
+            reason: 'Community post deflected a new duplicate question',
+          });
+        }
+      } catch (err) {
+        communityLog.warn(`[deflection] Failed to award deflection points: ${(err as Error).message}`);
+      }
+    }
+
+    res.json({
+      success: true,
+      message: 'Deflection recorded successfully. Thank you for avoiding duplicate questions!',
+    });
+  } catch (error) {
+    communityLog.error(`[deflection] Error recording deflection: ${(error as Error).message}`);
+    res.status(500).json({ message: 'Failed to record deflection' });
+  }
+};
